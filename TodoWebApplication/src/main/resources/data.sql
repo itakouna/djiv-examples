@@ -1,0 +1,10 @@
+INSERT INTO todo (id, is_done, target_date, description, username) VALUES (1001, false, '2023-08-29', 'Buy groceries', 'user');
+INSERT INTO todo (id, is_done, target_date, description, username) VALUES (1002, false, '2023-09-05', 'Prepare presentation', 'user');
+INSERT INTO todo (id, is_done, target_date, description, username) VALUES (1003, false, '2023-08-28', 'Call plumber', 'user');
+INSERT INTO todo (id, is_done, target_date, description, username) VALUES (1004, false, '2023-08-29', 'Go for a run', 'user');
+INSERT INTO todo (id, is_done, target_date, description, username) VALUES (1005, false, '2023-09-02', 'Write report', 'user');
+INSERT INTO todo (id, is_done, target_date, description, username) VALUES (1006, false, '2023-08-31', 'Attend meeting', 'llutsefer');
+INSERT INTO todo (id, is_done, target_date, description, username) VALUES (1007, false, '2023-09-10', 'Submit assignment', 'llutsefer');
+INSERT INTO todo (id, is_done, target_date, description, username) VALUES (1008, false, '2023-09-15', 'Review project proposal', 'llutsefer');
+INSERT INTO todo (id, is_done, target_date, description, username) VALUES (1010, false, '2023-09-25', 'Complete research paper', 'llutsefer');
+INSERT INTO todo (id, is_done, target_date, description, username) VALUES (1011, false, '2023-09-30', 'Organize team workshop', 'llutsefer');
