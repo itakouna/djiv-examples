@@ -1,0 +1,22 @@
+Resources:
+  MyEC2Instance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      ImageId: ami-036c2987dfef867fb
+      InstanceType: t2.micro
+      UserData: !Base64 
+        'Fn::Sub': >
+          #!/bin/bash -xe
+
+          # Install Apache web server
+
+          yum update -y
+
+          yum install -y httpd
+
+          systemctl start httpd
+
+          systemctl enable httpd
+
+          echo "<html><body><h1>Hello World!</h1></body></html>" >
+          /var/www/html/index.html
