@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-service
+  labels:
+    app: my-app
+spec: # Specifies the specification of the Service, including its selector and ports.
+  selector: # Specifies how the Service identifies which Pods to target.
+    app: my-app # Selects Pods with the label app=my-app
+  type: NodePort
+  ports:
+    - protocol: TCP #Specifies the protocol used for the port (TCP or UDP).
+      port: 80 # Specifies the port number on the Service itself.
+      targetPort: 8080 #Specifies the port number on the Pods targeted by the Service.

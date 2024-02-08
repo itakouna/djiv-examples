@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-deployment
+  labels:
+    app: my-app
+spec:
+  replicas: 3 #Specifies the desired number of replicas (instances) of the 
+  selector: # Specifies how the Deployment identifies which Pods to manage.
+    matchLabels: # Specifies the labels that Pods must have to be managed by this Deployment.
+      app: my-app
+  template: # Specifies the pod template used to create new Pods.
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+      - name: my-container
+        image: nginx:latest
+        ports:
+        - containerPort: 80

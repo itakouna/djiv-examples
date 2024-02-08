@@ -1,0 +1,7 @@
+# Namespace definition for separating resources within Kubernetes cluster
+apiVersion: v1 # Specifies the Kubernetes API version being used
+kind: Namespace # Specifies the type of resource being defined, in this case, a Namespace.
+metadata: # Contains metadata about the Namespace, such as its name and labels
+  name: my-namespace  # Name of the Namespace
+  labels: # Optional labels used to categorize or identify the Namespace.
+    environment: production  # Label to categorize the Namespace (optional)
