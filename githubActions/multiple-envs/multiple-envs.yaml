@@ -1,0 +1,40 @@
+name: GitHub Actions Multiple Environments
+run-name: ${{ github.actor }} tests GitHub Actions Multiple Environments 🚀
+on: [push]
+jobs:
+  unittest:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
+  integration_test:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
+  build:
+    runs-on: ubuntu-latest
+    needs:
+      - unittest
+      - integration_test
+    steps:
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
+
+  staging_deploy:
+    needs: 
+      - build #keyword is used to specify that a job depends on the successful 
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
+
+  prod_deploy:
+    needs:
+      - build #keyword is used to specify that a job depends on the successful 
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
