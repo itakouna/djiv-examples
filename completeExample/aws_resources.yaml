@@ -7,10 +7,6 @@ Description: >-
   **WARNING** This template creates an Amazon EC2 instance. You will be billed
   for the AWS resources used if you create a stack from this template.
 Parameters:
-  KeyName:
-    Description: Name of an existing EC2 KeyPair to enable SSH access to the instances
-    Type: 'AWS::EC2::KeyPair::KeyName'
-    ConstraintDescription: must be the name of an existing EC2 KeyPair.
   InstanceType:
     Description: WebServer EC2 instance type
     Type: String
