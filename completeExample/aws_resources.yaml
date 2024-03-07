@@ -254,7 +254,6 @@ Resources:
       InstanceType: !Ref InstanceType
       SecurityGroups:
         - !Ref WebServerSecurityGroup
-      KeyName: !Ref KeyName
       UserData: !Base64 
         'Fn::Join':
           - ''
