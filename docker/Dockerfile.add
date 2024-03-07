@@ -1,0 +1,6 @@
+FROM alpine
+# COPY hom* /opt/
+# download files from URLs into the image
+# automatically extract tar files 
+ADD https://github.com/itakouna/cloudformation-example/blob/main/resource.yaml /opt/
+ADD https://github.com/itakouna/cloudformation-example/blob/main/resource.yaml /opt/
