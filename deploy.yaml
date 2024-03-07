@@ -1,0 +1,3 @@
+template-file-path: completeExample/aws_resources.yaml
+parameters: {}
+tags: {}
