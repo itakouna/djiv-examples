@@ -1,293 +1,75 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: >-
-  AWS CloudFormation Sample Template WordPress_Single_Instance: WordPress is web
-  software you can use to create a beautiful website or blog. This template
-  installs WordPress with a local MySQL database for storage. It demonstrates
-  using the AWS CloudFormation bootstrap scripts to deploy WordPress.
-  **WARNING** This template creates an Amazon EC2 instance. You will be billed
-  for the AWS resources used if you create a stack from this template.
+  AWS CloudFormation Sample loadbalancer and ASG
 Parameters:
+  SecurityGroupDescription:
+    Description: Security Group Description
+    Type: String
   InstanceType:
-    Description: WebServer EC2 instance type
     Type: String
-    Default: t2.micro
-    AllowedValues:
-      - t1.micro
-      - t2.micro
-    ConstraintDescription: must be a valid EC2 instance type.
-  SSHLocation:
-    Description: The IP address range that can be used to SSH to the EC2 instances
-    Type: String
-    MinLength: '9'
-    MaxLength: '18'
-    Default: 0.0.0.0/0
-    AllowedPattern: '(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})'
-    ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x.
-  DBName:
-    Default: wordpressdb
-    Description: The WordPress database name
-    Type: String
-    MinLength: '1'
-    MaxLength: '64'
-    AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
-    ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
-  DBUser:
-    NoEcho: 'true'
-    Description: The WordPress database admin account username
-    Type: String
-    MinLength: '1'
-    MaxLength: '16'
-    ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
-  DBPassword:
-    NoEcho: 'true'
-    Description: The WordPress database admin account password
-    Type: String
-    MinLength: '1'
-    MaxLength: '41'
-    ConstraintDescription: must contain only alphanumeric characters.
-  DBRootPassword:
-    NoEcho: 'true'
-    Description: MySQL root password
-    Type: String
-    MinLength: '1'
-    MaxLength: '41'
-    ConstraintDescription: must contain only alphanumeric characters.
-Mappings:
-  AWSInstanceType2Arch:
-    t2.micro:
-      Arch: HVM64
-    t2.nano:
-      Arch: HVM64
-  AWSInstanceType2NATArch:
-    t2.micro:
-      Arch: NATHVM64
-    t2.nano:
-      Arch: NATHVM64
-    t2.small:
-      Arch: NATHVM64
-  AWSRegionArch2AMI:
-    us-east-2:
-      HVM64: ami-0412806bd0f2cf75f
-      HVMG2: NOT_SUPPORTED
-    us-east-1:
-      HVM64: ami-01989ebfd388ea377
-      HVMG2: NOT_SUPPORTED
-Resources:
-  WebServerSecurityGroup:
-    Type: 'AWS::EC2::SecurityGroup'
+  AvailabilityZones:
+    Type: List
+
+Resources:    
+  # security group
+  ELBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: >-
-        Enable HTTP access via port 80 locked down to the load balancer + SSH
-        access
+      GroupDescription: ELB Security Group
       SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: '80'
-          ToPort: '80'
-          CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: '22'
-          ToPort: '22'
-          CidrIp: !Ref SSHLocation
-  WebServer:
-    Type: 'AWS::EC2::Instance'
-    Metadata:
-      'AWS::CloudFormation::Init':
-        configSets:
-          wordpress_install:
-            - install_cfn
-            - install_wordpress
-            - configure_wordpress
-        install_cfn:
-          files:
-            /etc/cfn/cfn-hup.conf:
-              content: !Join 
-                - ''
-                - - |
-                    [main]
-                  - stack=
-                  - !Ref 'AWS::StackId'
-                  - |+
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
 
-                  - region=
-                  - !Ref 'AWS::Region'
-                  - |+
-
-              mode: '000400'
-              owner: root
-              group: root
-            /etc/cfn/hooks.d/cfn-auto-reloader.conf:
-              content: !Join 
-                - ''
-                - - |
-                    [cfn-auto-reloader-hook]
-                  - |
-                    triggers=post.update
-                  - |
-                    path=Resources.WebServer.Metadata.AWS::CloudFormation::Init
-                  - 'action=/opt/aws/bin/cfn-init -v '
-                  - '         --stack '
-                  - !Ref 'AWS::StackName'
-                  - '         --resource WebServer '
-                  - '         --configsets wordpress_install '
-                  - '         --region '
-                  - !Ref 'AWS::Region'
-                  - |+
-
-              mode: '000400'
-              owner: root
-              group: root
-          services:
-            sysvinit:
-              cfn-hup:
-                enabled: 'true'
-                ensureRunning: 'true'
-                files:
-                  - /etc/cfn/cfn-hup.conf
-                  - /etc/cfn/hooks.d/cfn-auto-reloader.conf
-        install_wordpress:
-          packages:
-            yum:
-              php73: []
-              php73-mysqlnd: []
-              mysql57: []
-              mysql57-server: []
-              mysql57-devel: []
-              mysql57-libs: []
-              httpd24: []
-          sources:
-            /var/www/html: 'http://wordpress.org/latest.tar.gz'
-          files:
-            /tmp/setup.mysql:
-              content: !Join 
-                - ''
-                - - 'CREATE DATABASE '
-                  - !Ref DBName
-                  - |
-                    ;
-                  - CREATE USER '
-                  - !Ref DBUser
-                  - '''@''localhost'' IDENTIFIED BY '''
-                  - !Ref DBPassword
-                  - |
-                    ';
-                  - 'GRANT ALL ON '
-                  - !Ref DBName
-                  - .* TO '
-                  - !Ref DBUser
-                  - |
-                    '@'localhost';
-                  - |
-                    FLUSH PRIVILEGES;
-              mode: '000400'
-              owner: root
-              group: root
-            /tmp/create-wp-config:
-              content: !Join 
-                - ''
-                - - |
-                    #!/bin/bash -xe
-                  - >
-                    cp /var/www/html/wordpress/wp-config-sample.php
-                    /var/www/html/wordpress/wp-config.php
-                  - sed -i "s/'database_name_here'/'
-                  - !Ref DBName
-                  - |
-                    '/g" wp-config.php
-                  - sed -i "s/'username_here'/'
-                  - !Ref DBUser
-                  - |
-                    '/g" wp-config.php
-                  - sed -i "s/'password_here'/'
-                  - !Ref DBPassword
-                  - |
-                    '/g" wp-config.php
-              mode: '000500'
-              owner: root
-              group: root
-          services:
-            sysvinit:
-              httpd:
-                enabled: 'true'
-                ensureRunning: 'true'
-              mysqld:
-                enabled: 'true'
-                ensureRunning: 'true'
-        configure_wordpress:
-          commands:
-            01_set_mysql_root_password:
-              command: !Join 
-                - ''
-                - - mysqladmin -u root password '
-                  - !Ref DBRootPassword
-                  - ''''
-              test: !Join 
-                - ''
-                - - '$(mysql '
-                  - !Ref DBName
-                  - ' -u root --password='''
-                  - !Ref DBRootPassword
-                  - ''' >/dev/null 2>&1 </dev/null); (( $? != 0 ))'
-            02_create_database:
-              command: !Join 
-                - ''
-                - - mysql -u root --password='
-                  - !Ref DBRootPassword
-                  - ''' < /tmp/setup.mysql'
-              test: !Join 
-                - ''
-                - - '$(mysql '
-                  - !Ref DBName
-                  - ' -u root --password='''
-                  - !Ref DBRootPassword
-                  - ''' >/dev/null 2>&1 </dev/null); (( $? != 0 ))'
-            03_configure_wordpress:
-              command: /tmp/create-wp-config
-              cwd: /var/www/html/wordpress
+  EC2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
     Properties:
-      ImageId: !FindInMap 
-        - AWSRegionArch2AMI
-        - !Ref 'AWS::Region'
-        - !FindInMap 
-          - AWSInstanceType2Arch
-          - !Ref InstanceType
-          - Arch
+      GroupDescription: !Ref SecurityGroupDescription
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        SourceSecurityGroupId: 
+          Fn::GetAtt:
+          - ELBSecurityGroup
+          - GroupId
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 0.0.0.0/0
+
+  CFLoadBalancer:
+      Type: AWS::ElasticLoadBalancing::LoadBalancer
+      Properties:
+        Listeners:
+          - LoadBalancerPort: '80'
+            InstancePort: '80'
+            Protocol: HTTP
+        AvailabilityZones: 
+        SecurityGroups: [!Ref ELBSecurityGroup]
+
+  CFAutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AvailabilityZones: !Ref AvailabilityZones
+      LaunchConfigurationName: !Ref CFLaunchConfiguration
+      MinSize: '2'
+      MaxSize: '5'
+      LoadBalancerNames: [!Ref CFLoadBalancer]
+
+  CFLaunchConfiguration:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      ImageId: 'ami-12345678'
       InstanceType: !Ref InstanceType
-      SecurityGroups:
-        - !Ref WebServerSecurityGroup
-      UserData: !Base64 
-        'Fn::Join':
-          - ''
-          - - |
-              #!/bin/bash -xe
-            - |
-              yum update -y aws-cfn-bootstrap
-            - '/opt/aws/bin/cfn-init -v '
-            - '         --stack '
-            - !Ref 'AWS::StackName'
-            - '         --resource WebServer '
-            - '         --configsets wordpress_install '
-            - '         --region '
-            - !Ref 'AWS::Region'
-            - |+
-
-            - '/opt/aws/bin/cfn-signal -e $? '
-            - '         --stack '
-            - !Ref 'AWS::StackName'
-            - '         --resource WebServer '
-            - '         --region '
-            - !Ref 'AWS::Region'
-            - |+
-
-    CreationPolicy:
-      ResourceSignal:
-        Timeout: PT15M
-Outputs:
-  WebsiteURL:
-    Value: !Join 
-      - ''
-      - - 'http://'
-        - !GetAtt 
-          - WebServer
-          - PublicDnsName
-        - /wordpress
-    Description: WordPress Website
+      SecurityGroups: [!Ref EC2SecurityGroup]
+      UserData: 
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          yum update -y
+          yum install -y httpd
+          systemctl start httpd
+          systemctl enable httpd
+          echo "<html><body><h1>Hello World from $(hostname -f) </h1></body></html>" >
+          /var/www/html/index.html

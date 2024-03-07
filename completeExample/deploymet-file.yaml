@@ -1,5 +1,4 @@
 template-file-path: ./completeExample/aws_resources.yaml
 parameters:
-  DBUser: "test"
-  DBPassword: "test"
-  DBRootPassword: "test200"
+  InstanceType: "t2.micro"
+  AvailabilityZones: ['us-east-1a', 'us-east-1b']
