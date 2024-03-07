@@ -1,5 +1,5 @@
 template-file-path: ./completeExample/aws_resources.yaml
 parameters:
-  DBUser: test
-  DBPassword: test
-  DBRootPassword: test200
+  DBUser: "test"
+  DBPassword: "test"
+  DBRootPassword: "test200"
