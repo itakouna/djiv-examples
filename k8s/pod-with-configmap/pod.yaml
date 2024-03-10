@@ -1,0 +1,16 @@
+# Pod Manifest using the ConfigMap:
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod   # Name of the Pod
+spec:
+  containers:
+    - name: my-container   # Name of the container within the Pod
+      image: nginx   # Docker image to be used by the container
+      volumeMounts:
+        - name: config-volume   # Name of the volume containing the ConfigMap
+          mountPath: /usr/share/nginx/html # Path to mount the ConfigMap within the container
+  volumes:
+    - name: config-volume   # Name of the volume
+      configMap:
+        name: my-configmap   # Name of the ConfigMap to be mounted

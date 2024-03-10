@@ -1,0 +1,16 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx-ingress   # Name of the Ingress
+spec:
+  rules:
+    - host: example.com   # Hostname for accessing the NGINX service
+      http:
+        paths:
+          - path: /   # Path within the host
+            pathType: Prefix   # Type of path matching
+            backend:
+              service:
+                name: nginx-service   # Name of the corresponding Service
+                port:
+                  number: 80   # Port number of the NGINX service

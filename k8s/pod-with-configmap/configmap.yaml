@@ -1,0 +1,17 @@
+# ConfigMap Manifest:
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-configmap   # Name of the ConfigMap
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <title>A simple HTML document</title>
+    </head>
+    <body>
+        <p>This is Deployment One!<p>
+    </body>
+    </html>
+

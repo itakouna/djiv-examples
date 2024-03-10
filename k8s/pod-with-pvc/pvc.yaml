@@ -1,0 +1,11 @@
+# PersistentVolumeClaim (PVC) Manifest:
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: my-pvc   # Name of the PersistentVolumeClaim
+spec:
+  accessModes:
+    - ReadWriteOnce  # Access mode for the storage
+  resources:
+    requests:
+      storage: 1Gi  # Storage capacity requested by the PVC

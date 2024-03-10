@@ -1,0 +1,17 @@
+# Pod Manifest using the PVC:
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod   # Name of the Pod
+spec:
+  volumes:
+    - name: my-volume  # Name of the volume within the Pod
+      persistentVolumeClaim:
+        claimName: my-pvc  # Name of the PVC to be used by the volume
+  containers:
+    - name: my-container  # Name of the container within the Pod
+      image: nginx   # Docker image to be used by the container
+      volumeMounts:
+        - mountPath: "/data"  # Path to mount the volume within the container
+          name: my-volume   # Name of the volume to be mounted
+

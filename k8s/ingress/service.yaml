@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service   # Name of the Service
+spec:
+  selector:
+    app: nginx   # Selector to match Pods with the label "app: nginx"
+  ports:
+    - protocol: TCP   # Protocol used by the service
+      port: 80   # Port number exposed by the service
+      targetPort: 80   # Port number on the Pods to which traffic will be forwarded

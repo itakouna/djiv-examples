@@ -1,0 +1,64 @@
+apiVersion: v1
+kind: Namespace # Specifies the type of resource being defined, in this case, a Namespace.
+metadata: # Contains metadata about the Namespace, such as its name and labels
+  name: nginx  # Name of the Namespace
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  namespace: nginx
+  labels:
+    app: nginx-app
+spec:
+  replicas: 2 #Specifies the desired number of replicas (instances) of the
+  selector: # Specifies how the Deployment identifies which Pods to manage.
+    matchLabels: # Specifies the labels that Pods must have to be managed by this Deployment.
+      app: nginx-app
+  template: # Specifies the pod template used to create new Pods.
+    metadata:
+      labels:
+        app: nginx-app
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+  namespace: nginx
+  labels:
+    app: nginx-app
+spec: # Specifies the specification of the Service, including its selector and ports.
+  selector: # Specifies how the Service identifies which Pods to target.
+    app: nginx-app # Selects Pods with the label
+  type: ClusterIP
+  ports:
+    - protocol: TCP #Specifies the protocol used for the port (TCP or UDP).
+      port: 80 # Specifies the port number on the Service itself.
+      targetPort: 80 #Specifies the port number on the Pods targeted by the Service.
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress
+  namespace: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+spec:
+  rules:
+    - host: nginx.info
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nginx-service
+                port:
+                  number: 80

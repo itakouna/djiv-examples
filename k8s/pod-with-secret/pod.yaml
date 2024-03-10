@@ -1,0 +1,19 @@
+# Pod Manifest using the Secret:
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod   # Name of the Pod
+spec:
+  containers:
+    - name: my-container   # Name of the container within the Pod
+      image: nginx   # Docker image to be used by the container
+      env:
+        - name: DB_USERNAME   # Environment variable for database username
+          valueFrom:
+            secretKeyRef:
+              name: my-secret   # Name of the Secret containing the username
+              key: username   # Key within the Secret for the username
+        - name: DB_PASSWORD   # Environment variable for database password
+          valueFrom:
+            secretKeyRef:
+              name: my-secret   
